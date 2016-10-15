@@ -8,13 +8,15 @@ var mongoose = require('mongoose'),
 // Creating an app
 var app = express();
 var db = mongoose(),
-
+var routes = require('./routes/index');
 //app.use(favicon(__dirname + '/public/assets/img/logo.ico'));
 
 // app.get('/', function (req, res) {
 //    res.send('Hello World');
 // })
 
+
+app.use('/', routes);
 // Server:
 // -app listens on 8080 for requests
 // -call back once instantiated
