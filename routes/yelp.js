@@ -65,18 +65,12 @@ function getReviewsOfNearbyPlaces(location, callback){
         var arr = new Array;
         
         var x  = 0;
-        //console.log(data);
         for(var i = 0; i < data.businesses.length; i++){
-            
             var business_id = data.businesses[i].id;
-            
-            //obj = {id : data.businesses[i].id, review : data.};
             getBusinessesInArea(business_id, function(err, business){
                 if (err) throw err;
                 console.log(business);
                 var obj = {id : business.id, review : business.reviews[0].excerpt};
-               
-                //arr[i] = obj;
                 arr.push(obj);
                 if(++x == data.businesses.length) callback(null, arr);
             })
