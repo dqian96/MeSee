@@ -2,14 +2,14 @@
 
 // Modules
 var express = require('express');
-var favicon = require('serve-favicon');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 
 // Creating an app
 var app = express();
-var db = mongoose(),
+mongoose.connect('mongodb://localhost:27017/ratemyhouse');
+var db = mongoose.connection;
 var routes = require('./routes/index');
 //app.use(favicon(__dirname + '/public/assets/img/logo.ico'));
 
