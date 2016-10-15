@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var path = require("path");
 var Yelp = require('yelp');
+var indico = require('indico.io');
+
+indico.apiKey = 'f844248f8582881cdf65b74c1718d0ac';
 
 
 var yelp = new Yelp({
@@ -60,24 +63,40 @@ function getReviewsOfNearbyPlaces(location, callback){
     getPlacesInArea(location, function(err, data){
         if(err) throw err;
         var arr = new Array;
-        var obj = {};
         
+        var x  = 0;
+        //console.log(data);
         for(var i = 0; i < data.businesses.length; i++){
             
             var business_id = data.businesses[i].id;
+            
             //obj = {id : data.businesses[i].id, review : data.};
             getBusinessesInArea(business_id, function(err, business){
                 if (err) throw err;
-                //console.log(i);
-                obj = {id : business_id, review : business.reviews.excerpt};
-                
+                console.log(business);
+                var obj = {id : business.id, review : business.reviews[0].excerpt};
+               
                 //arr[i] = obj;
-                arr[i] = obj;
-                
+                arr.push(obj);
+                if(++x == data.businesses.length) callback(null, arr);
             })
-            callback(null, arr);
         };
         //callback(null, arr);
     })
+}
+
+function indicoBatchSentimentAnalysis(reviewArr, callback){
+    indico.sentiment(reviewArr, function(err, results){
+        if (err) throw err;
+        var total = 0;
+        for(var i in arr) { total += arr[i]; }
+        var avg = total / reviewArr.length;
+        callback(err, avg);
+    })
+}
+
+function consolidateTotal(ratings, indico, crime, callback){
+    // give weight to each value
+    // generate a final score
 }
 module.exports = router;
