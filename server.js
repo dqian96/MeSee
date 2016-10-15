@@ -7,6 +7,13 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var path = require('path');
 var jade = require('jade');
+const dotenv = require('dotenv');
+
+
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
+dotenv.load({ path: 'env_vars' });
 
 // Creating an app
 var app = express();

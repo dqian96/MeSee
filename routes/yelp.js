@@ -2,13 +2,7 @@ var express = require('express');
 var router = express.Router();
 var path = require("path");
 var Yelp = require('yelp');
-const dotenv = require('dotenv');
 
-
-/**
- * Load environment variables from .env file, where API keys and passwords are configured.
- */
-dotenv.load({ path: 'env_vars' });
 
 var yelp = new Yelp({
   consumer_key: process.env.YELP_CONSUMER_KEY,
@@ -22,8 +16,18 @@ router.get('/location/:location', function(req, res, next) {
     var location = req.params.location;
     getRatingsOfPlaces(location, function(err, data){
         console.log(data);
+        res.json(data);
     }) 
-    res.render('index', { title: 'Express' });
+});
+
+
+router.get('/location1/:location', function(req, res, next) {
+    var location = req.params.location;
+    getReviewsOfNearbyPlaces(location, function(err, data){
+        console.log(data);
+        res.json(data);
+    })
+    res.render('index'); 
 });
 
 function getRatingsOfPlaces(location, callback){
@@ -34,7 +38,46 @@ function getRatingsOfPlaces(location, callback){
             sum += data.businesses[i].rating;
         }
         average = sum / data.businesses.length;
-        callback(null, average);	
+        callback(null, data);	
+    })
+}
+
+function getPlacesInArea(location, callback){
+    yelp.search({ location: location , radius_filter : 1500}, function(err, data){
+        if(err) throw err;
+        callback(null, data);
+    })	
+}
+
+function getBusinessesInArea(business, callback){
+    yelp.business(business, function(err, data){
+        if(err) throw err;
+        callback(null, data);
+    })	
+}
+
+function getReviewsOfNearbyPlaces(location, callback){
+    getPlacesInArea(location, function(err, data){
+        if(err) throw err;
+        var arr = new Array;
+        var obj = {};
+        
+        for(var i = 0; i < data.businesses.length; i++){
+            
+            var business_id = data.businesses[i].id;
+            //obj = {id : data.businesses[i].id, review : data.};
+            getBusinessesInArea(business_id, function(err, business){
+                if (err) throw err;
+                //console.log(i);
+                obj = {id : business_id, review : business.reviews.excerpt};
+                
+                //arr[i] = obj;
+                arr[i] = obj;
+                
+            })
+            callback(null, arr);
+        };
+        //callback(null, arr);
     })
 }
 module.exports = router;
