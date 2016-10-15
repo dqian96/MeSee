@@ -1,0 +1,17 @@
+{
+  "name": "ratemyhome",
+  "version": "1.0.0",
+  "description": "Evaluates home locations.",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "David",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "multer": "^1.2.0"
+  }
+}
