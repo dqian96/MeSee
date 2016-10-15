@@ -2,8 +2,10 @@
 
 // Modules
 var express = require('express');
-var favicon = require('serve-favicon'),
-var mongoose = require('mongoose'),
+var favicon = require('serve-favicon');
+var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
+var logger = require('morgan');
 
 // Creating an app
 var app = express();
@@ -14,6 +16,10 @@ var routes = require('./routes/index');
 // app.get('/', function (req, res) {
 //    res.send('Hello World');
 // })
+
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 app.use('/', routes);
