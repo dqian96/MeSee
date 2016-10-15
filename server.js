@@ -5,19 +5,24 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
-var Yelp = require('yelp');
+
 
 // Creating an app
 var app = express();
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+var routes = require('app/routes/index');
+app.use('/', routes);
+
+
+// Database
 mongoose.connect('mongodb://localhost:27017/ratemyhouse');
 var db = mongoose.connection;
-var routes = require('./routes/index');
-//app.use(favicon(__dirname + '/public/assets/img/logo.ico'));
 
-// app.get('/', function (req, res) {
-//    res.send('Hello World');
-// })
-
+// Yelp API
+var Yelp = require('yelp');
 var yelp = new Yelp({
   consumer_key: 'consumer-key',
   consumer_secret: 'consumer-secret',
@@ -25,12 +30,7 @@ var yelp = new Yelp({
   token_secret: 'token-secret',
 });
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
-
-app.use('/', routes);
 // Server:
 // -app listens on 8080 for requests
 // -call back once instantiated
@@ -42,4 +42,3 @@ var server = app.listen(8080, function () {
 
 // export of module i.e. return
 module.exports = app;
-
