@@ -5,6 +5,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
+var Yelp = require('yelp');
 
 // Creating an app
 var app = express();
@@ -16,6 +17,13 @@ var routes = require('./routes/index');
 // app.get('/', function (req, res) {
 //    res.send('Hello World');
 // })
+
+var yelp = new Yelp({
+  consumer_key: 'consumer-key',
+  consumer_secret: 'consumer-secret',
+  token: 'token',
+  token_secret: 'token-secret',
+});
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
