@@ -216,25 +216,9 @@ angular.module('app', ['rzModule'])
                 $scope.map_service.nearbySearch(request, function(results, status){
                     if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-                        var school_icon = {
-                            url : "img/school-icon.png",
-                            scaledSize : new google.maps.Size(32, 32)
-                        };
-                        
-
+                        console.log(results);
                         for (var i = 0; i < results.length; i++) {
-                            var place = results[i];
-                            var placeLoc = place.geometry.location;
-                            var marker = new google.maps.Marker({
-                              map: $scope.map,
-                              position: place.geometry.location,
-                              icon: school_icon
-                            });
-                            google.maps.event.addListener(marker, 'click', function() {
-                              $scope.infowindow.setContent(place.name);
-                              $scope.infowindow.open(map, this);
-                            });
-                            $scope.markers.push(marker);
+                           $scope.createMarker(results[i]);
                         }
                     }
                 });
@@ -246,6 +230,24 @@ angular.module('app', ['rzModule'])
 
             $scope.search_string = "";
         };
+
+        $scope.createMarker = function(place){
+            var school_icon = {
+                url : "img/school-icon.png",
+                scaledSize : new google.maps.Size(32, 32)
+            };
+            var placeLoc = place.geometry.location;
+            var marker = new google.maps.Marker({
+              map: $scope.map,
+              position: place.geometry.location,
+              icon: school_icon
+            });
+            google.maps.event.addListener(marker, 'click', function () {
+              $scope.infowindow.setContent(place.name);
+              $scope.infowindow.open(map, this);
+            });
+            $scope.markers.push(marker);
+        }
 
         $scope.updateSearchSuggestions = function () {
             $scope.search_suggestions = [];
