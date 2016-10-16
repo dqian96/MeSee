@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang-"en" ng-app="app">
+  <head>
+    <meta charset="UTF-8">
+    <title>Whatever</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+	  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNQK2k1J6AmhQzP5BkB9BLOrfq61ng4Qs&libraries=places"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.1/rzslider.min.js"></script>
+    <script src="lib/loadjson.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/backend.js"></script>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.1/rzslider.min.css" rel="stylesheet">
+    <link href="css/normalize.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body ng-controller="MainController">
+	  <div class="wrapper">
+		  <div class="options-wrapper">
+		  	<h1>Smart Search</h1>
+		  	<h3>Preferences</h3>
+		  	<div class="preference" ng-repeat="pref in prefs">
+			  	<h2>{{pref.name}}</h2>
+			  	<rzslider rz-slider-model="pref.value" rz-slider-options="pref.options"></rzslider>
+				</div>
+				<div class="search-button" ng-click="findNeighbourhood()">Find me a place!</div>
+		  </div>
+		  <div class="map-wrapper">
+			  <div id="map"></div>
+			  <input id="searchbox" class="card" ng-model="search_string" ng-change="updateSearchSuggestions()" placeholder="Search..."></input>
+			  <div id="search-suggestions" class="card" ng-if="search_string">
+			  	<div class="search-suggestion" ng-repeat="suggestion in search_suggestions | limitTo:5"
+				  	ng-click="viewNeighbourhood(suggestion)">
+			  		{{suggestion.getProperty("HOOD")}}
+			  	</div>
+			  	<div class="search-suggestion no-result" ng-if="search_suggestions.length==0">
+			  		No Results Found
+			  	</div>
+			  </div>
+			  <div id="region-label" class="card" ng-if="hovered_region">{{hovered_region}}</div>
+			  <div id="infobox" class="card" ng-if="selected_region">
+			  	<h1>{{selected_region.name}}</h1>
+			  	<svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"
+				  	ng-if="loading">
+						<circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+					</svg>
+					<p ng-if="error">Data fetch error</p>
+			  </div>
+		  </div>
+	  </div>
+  </body>
+</html>
