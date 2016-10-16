@@ -53,7 +53,7 @@ router.get('/:location/:location_id', function(req, res, next) {
     var location = req.params.location;
     var location_id = req.params.location_id;
     consolidateTotal(location, location_id, function(err, results){
-        console.log(results);
+        console.log("final score: " + results);
         res.json(results);
     })
     res.render('index'); 
@@ -144,7 +144,7 @@ function getCrimeIndex(callback){
             if (obj.hasOwnProperty(key)) {
                 var crimeTotal = 0;
                 crimeTotal = Number(obj[key].assault) + Number(obj[key].break_and_enter) + Number(obj[key].sexual_assault) + Number(obj[key].drug) + Number(obj[key].robbery) + Number(obj[key].vehicle) + Number(obj[key].theft);
-                crimeTotal /= 7;
+                crimeTotal = (crimeTotal / 7) * 25;
                 crimeTotal = Number((crimeTotal).toFixed(5));
                 var nobj = {num : key, crime_total : crimeTotal};
                 crime_arr.push(nobj);
@@ -156,7 +156,6 @@ function getCrimeIndex(callback){
 function getCrimeIndexByLocationID(location_id, callback){
     getCrimeIndex(function(err, data){
         var res = data[location_id].crime_total;
-        console.log(res);
         callback(null, res);
     })
 }
@@ -201,7 +200,12 @@ function consolidateTotal(location, location_id, callback){
             indicoBatchSentimentAnalysis(location, function(err, indicoData){
                 if (err) throw err;
                 indicoF = indicoData;
+                console.log("ratings data " + ratingsData + "/70");
+                console.log("crime data " + crimeF + "/25");
+                console.log("indico data" + indicoF + "/5");
                 score = ratingsData + crimeF + indicoF;
+                score = Number((score).toFixed(1));
+                console.log("final score " + score + "/100");
                 callback(null, score);
             })
         })
