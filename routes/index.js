@@ -3,8 +3,9 @@ var router = express.Router();
 var path = require("path");
 
 /* GET home page. */
+
 router.get('/', function(req, res, next) {
-  res.send('Index');
+  res.sendFile(path.join(__dirname + '/../front_end/index.html'));
 });
 
 module.exports = router;

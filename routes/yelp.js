@@ -91,7 +91,7 @@ function indicoBatchSentimentAnalysis(location, callback){
             callback(null, avg);
         })
         .catch(function(err) {
-            //if (err)  throw err;
+            if (err)  throw err;
         });
     })
 }

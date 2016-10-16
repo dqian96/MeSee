@@ -9,6 +9,7 @@ angular.module('app', ['rzModule'])
                 value: 4,
                 options: {
                     floor: 1,
+                    ceil:5,
                     showSelectionBar: true,
                 }
             },
@@ -17,6 +18,7 @@ angular.module('app', ['rzModule'])
                 value: 4,
                 options: {
                     floor: 1,
+                    ceil:5,
                     showSelectionBar: true,
                 }
             },
@@ -25,6 +27,7 @@ angular.module('app', ['rzModule'])
                 value: 4,
                 options: {
                     floor: 1,
+                    ceil:5,
                     showSelectionBar: true,
                 }
             }
@@ -81,16 +84,25 @@ angular.module('app', ['rzModule'])
                 if (status === 'OK') {
                     if (results[0]) {  
                         console.log(results[0]);
-                        // Backend.getInfoByRegion(
-                        //     results[0].formatted_address,
-                        //     nb.getProperty("HOODNUM")
-                        //     );
+                        Backend.getInfoByRegion(
+                            results[0].formatted_address,
+                            nb.getProperty("HOODNUM"),
+                            function(succ_data){
+                                console.log(succ_data);
+                                $scope.loading = false;
+                                $scope.selected_region_info = succ_data;
+                            },function(fail_data){
+                                console.log(fail_data);
+                                $scope.loading = false;
+                                $scope.selected_region_info = fail_data;
+                            });
                     } else {
                         window.alert('No results found');
+                        $scope.loading = false;
                         $scope.error = true;
                     }
-                    $scope.loading = false;
                 } else {
+                    $scope.loading = false;
                     $scope.error = true;
                     window.alert('Geocoder failed due to: ' + status);
                 }

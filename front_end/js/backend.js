@@ -2,14 +2,19 @@ angular.module('app')
 .service('Backend', function($http) {
 
 	return {
-		getInfoByRegion: function(addr_string, region_num, callback) {
-			$http.get(':3000/yelp/' + addr_string + "/" + region_num)
+		getInfoByRegion: function(addr_string, region_num, successcallback, failurecallback) {
+
+
+			addr_string = addr_string.replace(/,/gmi, "").replace(/ /gmi, "-");
+
+			$http.get('http://localhost:3000/yelp/' + addr_string + "/" + region_num, 
+				{timeout: 3000})
 				.then(function(success) {
 					console.log(success);
-					callback();
+					successcallback(success.data);
 				}, function(fail) {
 					console.log(fail);
-					callback();
+					failurecallback(fail);
 			});
 		}
 	};

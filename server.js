@@ -21,6 +21,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(express.static('front_end'));
 var routes = require('./routes/index');
 var yelpRoute = require('./routes/yelp');
 app.use('/', routes);
