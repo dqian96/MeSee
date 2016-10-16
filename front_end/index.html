@@ -26,12 +26,12 @@
 			  	<rzslider rz-slider-model="pref.value" rz-slider-options="pref.options"></rzslider>
 			</div>
 			<div class="center-xy">Do you travel by public transit?
-			  <input id="switch" type="checkbox" ng-model="show_transit" ng-change="toggleTransit()" hidden />
-			  <label for="switch" class="switch"></label>
+			  <input id="switch_transit" type="checkbox" ng-model="show_transit" ng-change="toggleTransit()" hidden />
+			  <label for="switch_transit" class="switch"></label>
 			</div>
 			<div class="center-xy">Do you have children?
-			  <input id="switch" type="checkbox" ng-model="show_school_regions" ng-change="toggleSchools()" hidden />
-			  <label for="switch" class="switch"></label>
+			  <input id="switch_schools" type="checkbox" ng-model="show_school_regions" hidden />
+			  <label for="switch_schools" class="switch"></label>
 			</div>
 
 			<div class="search-button" ng-click="findNeighbourhood()" ng-disabled="search_progress < 0&&search_progress < 100">Find me a place!</div>

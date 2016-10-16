@@ -138,6 +138,11 @@ angular.module('app', ['rzModule'])
 
         $scope.viewNeighbourhood = function(nb){
 
+            // kills all markers
+            for (var i = 0; i < $scope.markers.length; i++) {
+              $scope.markers[i].setMap(null);
+            }
+
             $scope.loading = true;
             $scope.map.data.revertStyle();
             $scope.selected_region = {
@@ -184,6 +189,7 @@ angular.module('app', ['rzModule'])
                                     succ_data.indicoF*(100/5)*$scope.prefs[2].value/t_weight;
                                 succ_data.weighted_rating = Math.round(t_total);
                                 $scope.selected_region_info = succ_data;
+
                             },function(fail_data){
                                 console.log(fail_data);
                                 $scope.loading = false;
@@ -200,6 +206,40 @@ angular.module('app', ['rzModule'])
                     window.alert('Geocoder failed due to: ' + status);
                 }
             });
+
+            if ($scope.show_school_regions){
+                var request = {
+                    location: latlng,
+                    type: 'school',
+                    radius: 2000
+                };
+                $scope.map_service.nearbySearch(request, function(results, status){
+                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+                        var school_icon = {
+                            url : "img/school-icon.png",
+                            scaledSize : new google.maps.Size(32, 32)
+                        };
+                        
+
+                        for (var i = 0; i < results.length; i++) {
+                            var place = results[i];
+                            var placeLoc = place.geometry.location;
+                            var marker = new google.maps.Marker({
+                              map: $scope.map,
+                              position: place.geometry.location,
+                              icon: school_icon
+                            });
+                            google.maps.event.addListener(marker, 'click', function() {
+                              $scope.infowindow.setContent(place.name);
+                              $scope.infowindow.open(map, this);
+                            });
+                            $scope.markers.push(marker);
+                        }
+                    }
+                });
+            }
+            
 
             $scope.map.panTo(new google.maps.LatLng(lat, lng));
             console.log($scope.selected_region);
@@ -220,7 +260,6 @@ angular.module('app', ['rzModule'])
 
         // initialize maps
         function initMap() {
-
             $scope.search_string = "";
 
             $scope.map = new google.maps.Map(document.getElementById('map'), {
@@ -234,6 +273,9 @@ angular.module('app', ['rzModule'])
 
             $scope.geocoder = new google.maps.Geocoder;
             $scope.transitLayer = new google.maps.TransitLayer();
+            $scope.map_service = new google.maps.places.PlacesService($scope.map);
+            $scope.infowindow = new google.maps.InfoWindow();
+            $scope.markers = [];
 
             $scope.map.data.setStyle({
                 strokeWeight: 1,
