@@ -1,8 +1,15 @@
 angular.module('app', ['rzModule'])
     .controller('MainController', function($scope, Backend) {
 
-        /* OPTIONS */
+        $scope.show_transit = false;
+        $scope.show_school_regions = false;
 
+        $scope.toggleTransit = function() {
+            $scope.transitLayer.setMap($scope.show_transit ? $scope.map : null);
+        };
+
+
+        /* OPTIONS */
         $scope.prefs = [
             {
                 name: "Safety",
@@ -14,7 +21,7 @@ angular.module('app', ['rzModule'])
                 }
             },
             {
-                name: "Local Businesses",
+                name: "Average Shop Ratings",
                 value: 4,
                 options: {
                     floor: 1,
@@ -33,24 +40,101 @@ angular.module('app', ['rzModule'])
             }
         ];
 
+        // Recursive function to find shit ez
+        $scope.findRegions = function (nb, j, max, callback) {
+            var temp_polys = nb.getGeometry();
+            var i = 0, lat = 0, lng = 0;
+            temp_polys.forEachLatLng(function(latlng){
+                lat+=latlng.lat();
+                lng+=latlng.lng();
+                i++;
+            });
+            lat = lat/i;
+            lng = lng/i;
+            var latlng = {lat: parseFloat(lat), lng: parseFloat(lng)};
+            $scope.geocoder.geocode({'location': latlng}, function(results, status) {
+                if (status === 'OK') {
+                    if (results[0]) {  
+                        console.log(results[0]);
+                        Backend.getInfoByRegion(
+                            results[0].formatted_address,
+                            nb.getProperty("HOODNUM"),
+                            function(succ_data){
+                                console.log(succ_data);
+                                $scope.new_arr.push({hood: nb, data: succ_data});
+
+                                j++;
+                                $scope.search_progress = Math.round(j/max*100);
+                                console.log(j/max);
+
+                                if (j>=max){
+                                    console.log("yup or nup");
+                                    callback($scope.new_arr);
+                                } else {
+                                    t_arr = [{hood: nb, data: succ_data}];
+                                    var t_region = $scope.hood_arr_clone.splice(Math.floor(Math.random()*$scope.hood_arr_clone.length),1)[0];
+                                    $scope.findRegions(t_region, j, max, callback);
+                                    console.log(t_region.getProperty('HOOD'));
+                                }
+
+                            },function(fail_data){
+                                console.log(fail_data);
+                                var t_region = $scope.hood_arr_clone.splice(Math.floor(Math.random()*$scope.hood_arr_clone.length),1)[0];
+                                $scope.findRegions(t_region, j, max, callback);
+                            });
+                    } else {
+                        // keep going
+                        window.alert('No results found');
+                        var t_region = $scope.hood_arr_clone.splice(Math.floor(Math.random()*$scope.hood_arr_clone.length),1)[0];
+                        $scope.findRegions(t_region, j, max, callback);
+                    }
+                } else {
+                    // Keep going
+                    window.alert('Geocoder failed due to: ' + status);
+                    var t_region = $scope.hood_arr_clone.splice(Math.floor(Math.random()*$scope.hood_arr_clone.length),1)[0];
+                    $scope.findRegions(t_region, j, max, callback);
+                }
+            });
+        }
+
         $scope.findNeighbourhood = function(){
-            // Fetch 10 random places
+            $scope.search_progress = 0;
+            $scope.search_results = null;
+            $scope.hood_arr_clone = neighbourhood_array.slice(0);
+            $scope.new_arr = [];
+            var t_region = $scope.hood_arr_clone.splice(Math.floor(Math.random()*$scope.hood_arr_clone.length),1)[0];
+
+            $scope.search_results = $scope.findRegions(t_region, 0, 6,
+                function(arr_succ){
+                    console.log(arr_succ);
+
+                    arr_succ.sort(function(a,b){
+                        var t_weight = $scope.prefs[0].value + 
+                            $scope.prefs[1].value + 
+                            $scope.prefs[2].value;
+
+                        var a_total = a.data.crimeF*(100/25)*$scope.prefs[0].value/t_weight + 
+                            a.data.ratingsData*(100/70)*$scope.prefs[1].value/t_weight + 
+                            a.data.indicoF*(100/5)*$scope.prefs[2].value/t_weight;
+
+                            a.data.weighted_rating = Math.round(a_total);
+
+                        var b_total = b.data.crimeF*(100/25)*$scope.prefs[0].value/t_weight + 
+                            b.data.ratingsData*(100/70)*$scope.prefs[1].value/t_weight + 
+                            b.data.indicoF*(100/5)*$scope.prefs[2].value/t_weight;
+
+                            b.data.weighted_rating = Math.round(b_total);
+
+                        return b_total - a_total;
+                    });
+
+                    $scope.search_results = arr_succ;
+                });
         };
 
         /* MAP */
         var neighbourhood_array = [];
         $scope.search_suggestions = [];
-
-        $scope.updateSearchSuggestions = function () {
-            $scope.search_suggestions = [];
-            if ($scope.search_string !== "") {            
-                neighbourhood_array.forEach(function(region){
-                    if (region.getProperty("HOOD").toLowerCase().indexOf($scope.search_string) != -1){
-                        $scope.search_suggestions.push(region);
-                    }
-                });
-            }
-        };
 
         $scope.viewNeighbourhood = function(nb){
 
@@ -91,11 +175,19 @@ angular.module('app', ['rzModule'])
                             function(succ_data){
                                 console.log(succ_data);
                                 $scope.loading = false;
+
+                                var t_weight = $scope.prefs[0].value + 
+                                    $scope.prefs[1].value + 
+                                    $scope.prefs[2].value;
+                                var t_total = succ_data.crimeF*(100/25)*$scope.prefs[0].value/t_weight + 
+                                    succ_data.ratingsData*(100/70)*$scope.prefs[1].value/t_weight + 
+                                    succ_data.indicoF*(100/5)*$scope.prefs[2].value/t_weight;
+                                succ_data.weighted_rating = Math.round(t_total);
                                 $scope.selected_region_info = succ_data;
                             },function(fail_data){
                                 console.log(fail_data);
                                 $scope.loading = false;
-                    
+
                                 $scope.selected_region_info = fail_data;
                             });
                     } else {
@@ -105,7 +197,6 @@ angular.module('app', ['rzModule'])
                     }
                 } else {
                     $scope.loading = false;
-        
                     window.alert('Geocoder failed due to: ' + status);
                 }
             });
@@ -114,8 +205,17 @@ angular.module('app', ['rzModule'])
             console.log($scope.selected_region);
 
             $scope.search_string = "";
+        };
 
-            
+        $scope.updateSearchSuggestions = function () {
+            $scope.search_suggestions = [];
+            if ($scope.search_string !== "") {            
+                neighbourhood_array.forEach(function(region){
+                    if (region.getProperty("HOOD").toLowerCase().indexOf($scope.search_string) != -1){
+                        $scope.search_suggestions.push(region);
+                    }
+                });
+            }
         };
 
         // initialize maps
@@ -133,6 +233,7 @@ angular.module('app', ['rzModule'])
             });
 
             $scope.geocoder = new google.maps.Geocoder;
+            $scope.transitLayer = new google.maps.TransitLayer();
 
             $scope.map.data.setStyle({
                 strokeWeight: 1,

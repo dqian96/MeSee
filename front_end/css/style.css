@@ -20,8 +20,38 @@
 .options-wrapper h1 {
 	text-align: center;
 }
+
+.options-wrapper label {
+  text-align: left;
+}
+
+.options-wrapper label input {
+  text-align: right;
+}
+
 .options-wrapper .search-button {
-	margin: 2em auto;
+  margin-top:2em;
+  margin-bottom:2em;
+  padding: 10px;
+  background-color: #e2e2e2;
+  border-radius: 3px;
+}
+.options-wrapper .search-button:hover {
+  background-color: #c1c1c1;
+}
+.search-results {
+  text-align: left;
+  color: #656565;
+  padding: 15px 0;
+  position: relative;
+}
+.search-results:hover {
+  background-color: #dadada;
+}
+
+.search-results span {
+  position: absolute;
+  right: 0;
 }
 
 /* Map Stuff! */
@@ -76,10 +106,21 @@
 #infobox{
 	bottom: 30px;
 	left: 30px;
+  min-width: 300px;
 	position: absolute;
 }
 #infobox h1 {
 	padding-top: 0;
+}
+#infobox .ratings {
+  position: relative;
+}
+#infobox .stats {
+  margin-bottom: 10px;
+}
+#infobox .stats span{
+  position: absolute;
+  right: 0;
 }
 
 /* Loader */
@@ -201,4 +242,61 @@ body {
     -webkit-transform: rotate(450deg);
             transform: rotate(450deg);
   }
+}
+
+/* toggle */
+.switch {
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  padding: 4px;
+  border-radius: 20px;
+  background: #ccc;
+  vertical-align: middle;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  transition: background 350ms ease;
+}
+.switch:before, .switch:after {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transition: all 350ms cubic-bezier(0, 0.95, 0.38, 0.98), background 150ms ease;
+}
+.switch:before {
+  background: rgba(128, 128, 128, 0.075);
+  transform: translate3d(0, -50%, 0) scale(0);
+}
+.switch:after {
+  background: grey;
+  transform: translate3d(0, -50%, 0);
+}
+.switch:active:before {
+  transform: translate3d(0, -50%, 0) scale(3);
+}
+
+input:checked + .switch {
+  background: #c2e1f7;
+}
+input:checked + .switch:before {
+  background: rgba(131, 177, 84, 0.075);
+  transform: translate3d(100%, -50%, 0) scale(1);
+}
+input:checked + .switch:after {
+  background: #0db9f0;
+  transform: translate3d(100%, -50%, 0);
+}
+input:checked + .switch:active:before {
+  background: rgba(131, 177, 84, 0.075);
+  transform: translate3d(100%, -50%, 0) scale(3);
+}
+
+.center-xy {
+  margin-top: 30px;
+  position: relative;
 }

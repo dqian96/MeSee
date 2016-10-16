@@ -13,26 +13,42 @@
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.1/rzslider.min.css" rel="stylesheet">
     <link href="css/normalize.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
   </head>
   <body ng-controller="MainController">
 	  <div class="wrapper">
 		  <div class="options-wrapper">
 		  	<h1>Smart Search</h1>
-		  	<h3>Preferences</h3>
+		  	<h3>Select your Preferences</h3>
 		  	<div class="preference" ng-repeat="pref in prefs">
 			  	<h2>{{pref.name}}</h2>
 			  	<rzslider rz-slider-model="pref.value" rz-slider-options="pref.options"></rzslider>
-				</div>
-				<div class="search-button" ng-click="findNeighbourhood()">Find me a place!</div>
+			</div>
+			<div class="center-xy">Do you travel by public transit?
+			  <input id="switch" type="checkbox" ng-model="show_transit" ng-change="toggleTransit()" hidden />
+			  <label for="switch" class="switch"></label>
+			</div>
+			<div class="center-xy">Do you have children?
+			  <input id="switch" type="checkbox" ng-model="show_school_regions" ng-change="toggleSchools()" hidden />
+			  <label for="switch" class="switch"></label>
+			</div>
+
+			<div class="search-button" ng-click="findNeighbourhood()" ng-disabled="search_progress < 0&&search_progress < 100">Find me a place!</div>
+			<div ng-if="search_progress < 100">Processing: {{search_progress}} %</div>
+			<div ng-if="search_results.length">Top 5 Personal Neighbourhood Matches:</div>
+			<div class="search-results" ng-repeat="result in search_results | limitTo:4 " ng-click="viewNeighbourhood(result.hood)">
+				{{result.hood.getProperty("HOOD")}} <span>{{result.data.weighted_rating + '%'}}</span>
+			</div>
+
 		  </div>
 		  <div class="map-wrapper">
 			  <div id="map"></div>
 			  <input id="searchbox" class="card" ng-model="search_string" ng-change="updateSearchSuggestions()" placeholder="Search..."></input>
 			  <div id="search-suggestions" class="card" ng-if="search_string">
-			  	<div class="search-suggestion" ng-repeat="suggestion in search_suggestions | limitTo:5"
+			  	<div class="search-suggestion" ng-repeat="suggestion in search_suggestions | limitTo:5 "
 				  	ng-click="viewNeighbourhood(suggestion)">
-			  		{{suggestion.getProperty("HOOD")}}
+			  		{{suggestion.getProperty("HOOD")}}			  		
 			  	</div>
 			  	<div class="search-suggestion no-result" ng-if="search_suggestions.length==0">
 			  		No Results Found
@@ -41,7 +57,25 @@
 			  <div id="region-label" class="card" ng-if="hovered_region">{{hovered_region}}</div>
 			  <div id="infobox" class="card" ng-if="selected_region">
 			  	<h1>{{selected_region.name}}</h1>
-			  	<div ng-if="selected_region_info && selected_region_info.score">{{selected_region_info}}</div>
+			  	<div class="ratings" ng-if="selected_region_info && selected_region_info.score">
+			  		<h2>Ratings:</h2>
+			  		<div class="stats"><i class="ion-lock-combination"></i>  
+				  		Security: <span>{{selected_region_info.crimeF * 100 / 25 | number:1}} %</span>
+			  		</div>
+			  		<div class="stats"><i class="ion-bag"></i>  
+				  		Local Shops: <span>{{selected_region_info.ratingsData * 100 / 70 | number:1}} %</span>
+			  		</div>
+			  		<div class="stats"><i class="ion-chatbox-working"></i>  
+				  		General Sentiment: <span>{{selected_region_info.indicoF * 100 / 5 | number:1}} %</span>
+			  		</div>
+			  		<br>
+			  		<div class="stats"><i class="ion-pie-graph"></i>  
+				  		Our Rating: <span>{{selected_region_info.score | number:1}} %</span>
+			  		</div>
+			  		<div class="stats"><i class="ion-person"></i>  
+				  		Your Personal Rating: <span>{{selected_region_info.weighted_rating | number:1}} %</span>
+			  		</div>
+			  	</div>
 			  	<svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"
 				  	ng-if="loading">
 						<circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
