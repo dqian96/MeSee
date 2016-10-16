@@ -16,39 +16,6 @@ var yelp = new Yelp({
   token_secret: process.env.YELP_TOKEN_SECRET,
 }); 
 
-/* GET home page. */
-router.get('/location/:location', function(req, res, next) {
-    var location = req.params.location;
-    getRatingsOfPlaces(location, function(err, data){
-        res.json(data);
-    }) 
-});
-
-
-router.get('/location1/:location', function(req, res, next) {
-    var location = req.params.location;
-    getReviewsOfNearbyPlaces(location, function(err, data){
-        res.json(data);
-    })
-    res.render('index'); 
-});
-
-router.get('/location2/:location', function(req, res, next) {
-    var location = req.params.location;
-    indicoBatchSentimentAnalysis(location, function(err, data){
-        res.json(data);
-    })
-    res.render('index'); 
-});
-
-router.get('/crime/:num', function(req, res, next) {
-    var num = req.params.location;
-    getCrimeIndex(function(err, data){
-        res.json('OK');
-    })
-    
-});
-
 router.get('/:location/:location_id', function(req, res, next) {
     var location = req.params.location;
     var location_id = req.params.location_id;
@@ -56,7 +23,6 @@ router.get('/:location/:location_id', function(req, res, next) {
         console.log("final score: " + results);
         res.json(results);
     })
-    res.render('index'); 
 });
 
 
@@ -206,7 +172,13 @@ function consolidateTotal(location, location_id, callback){
                 score = ratingsData + crimeF + indicoF;
                 score = Number((score).toFixed(1));
                 console.log("final score " + score + "/100");
-                callback(null, score);
+                var scoreObj = {
+                    ratingsData,
+                    crimeF,
+                    indicoF,
+                    score,
+                };
+                callback(null, scoreObj);
             })
         })
     })
