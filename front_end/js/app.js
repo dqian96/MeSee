@@ -23,7 +23,7 @@ angular.module('app', ['rzModule'])
                 }
             },
             {
-                name: "Transit",
+                name: "General Sentiment",
                 value: 4,
                 options: {
                     floor: 1,
@@ -53,7 +53,7 @@ angular.module('app', ['rzModule'])
         };
 
         $scope.viewNeighbourhood = function(nb){
-            $scope.error = false;
+
             $scope.loading = true;
             $scope.map.data.revertStyle();
             $scope.selected_region = {
@@ -61,6 +61,7 @@ angular.module('app', ['rzModule'])
                 number: nb.getProperty("HOODNUM"),
                 map_obj: nb
             };
+            $scope.selected_region_info = null;
             $scope.map.data.overrideStyle($scope.selected_region.map_obj, {fillColor: '#4ccaff'});
             $scope.map.data.overrideStyle($scope.selected_region.map_obj, {strokeColor: '#4ccaff'});
             $scope.map.data.overrideStyle($scope.selected_region.map_obj, {strokeWeight: 3});
@@ -94,16 +95,17 @@ angular.module('app', ['rzModule'])
                             },function(fail_data){
                                 console.log(fail_data);
                                 $scope.loading = false;
+                    
                                 $scope.selected_region_info = fail_data;
                             });
                     } else {
                         window.alert('No results found');
                         $scope.loading = false;
-                        $scope.error = true;
+            
                     }
                 } else {
                     $scope.loading = false;
-                    $scope.error = true;
+        
                     window.alert('Geocoder failed due to: ' + status);
                 }
             });
