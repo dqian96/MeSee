@@ -5,8 +5,7 @@ var Yelp = require('yelp');
 var indico = require('indico.io');
 var fs = require('fs');
 
-//indico.apiKey = process.env.INDICO_API_KEY;
-indico.apiKey = '61f321e617349d9852cef5d2424baa96';
+indico.apiKey = process.env.INDICO_API_KEY;
 var crime_json = fs.readFileSync('crime.json', 'utf8');
 
 var yelp = new Yelp({
