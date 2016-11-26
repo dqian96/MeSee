@@ -3,7 +3,7 @@ MeSee consists of 3 components:
 * Javascript frontend: 
   * Single page web app
   * Draws fragments on top of Google Maps API to visualize data pertaining to each region/district 
-  * Sends and recieve data to backend
+  * Communicates with backend
 * Node.js backend:
   * Relay data pertaining to regions for frontend visualization
   * Queries Google Maps API, Yelp API, and scraped data in order to calculate where an user should live using a proprietary algorithm
